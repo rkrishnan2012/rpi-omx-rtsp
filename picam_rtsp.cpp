@@ -8,6 +8,7 @@
 #include <interface/vcos/vcos.h>
 #include <IL/OMX_Broadcom.h>
 #include <pthread.h>
+#include <iostream>
 
 #include "omx_dump.hh"
 #include "omx_utils.hh"
@@ -23,6 +24,7 @@ int main (int argc, char** argv)
     int bitrate = 3000000;
     char *captureUrl = "0.0.0.0";
 
+    int c = 0;
     while ((c = getopt (argc, argv, "vhW:H:r:f:b:")) != -1)
     {
         switch (c)
