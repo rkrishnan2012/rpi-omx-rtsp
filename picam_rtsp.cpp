@@ -16,6 +16,37 @@
 
 int main (int argc, char** argv)
 {
+    bool verbose = 0;
+    int width = 640;
+    int height = 480;
+    int fps = 30;
+    int bitrate = 3000000;
+    char *captureUrl = "0.0.0.0";
+
+    while ((c = getopt (argc, argv, "vhW:H:r:f:b:")) != -1)
+    {
+        switch (c)
+        {
+            case 'v':   verbose = 1; break;
+            case 'W':   width = atoi(optarg); break;
+            case 'H':   height = atoi(optarg); break;
+            case 'r':   captureUrl = optarg; break;           
+            case 'f':   fps = atoi(optarg); break;
+            case 'b':   bitrate = atoi(optarg); break;
+            case 'h':
+            {
+                std::cout << argv[0] << " [-v] [-w width] [-h height] dest_device" << std::endl;
+                std::cout << "\t -v            : verbose " << std::endl;
+                std::cout << "\t -w width      : capture width (default "<< width << ")" << std::endl;
+                std::cout << "\t -h height     : capture height (default "<< height << ")" << std::endl;
+                std::cout << "\t -f fps        : capture framerate (default "<< fps << ")" << std::endl;
+                std::cout << "\t -b bitrate    : capture bitrate (default "<< bitrate << ")" << std::endl;
+                std::cout << "\t -r            : rtsp url (default " << captureUrl << ")" << std::endl;
+                exit(0);
+            }
+        }
+    }
+
     OMX_ERRORTYPE error;
     OMX_BUFFERHEADERTYPE* encoder_output_buffer;
     component_t camera;
@@ -55,10 +86,10 @@ int main (int argc, char** argv)
                  dump_OMX_ERRORTYPE (error));
         exit (1);
     }
-    port_st.format.video.nFrameWidth = CAM_WIDTH;
-    port_st.format.video.nFrameHeight = CAM_HEIGHT;
-    port_st.format.video.nStride = CAM_WIDTH;
-    port_st.format.video.xFramerate = VIDEO_FRAMERATE << 16;
+    port_st.format.video.nFrameWidth = width;
+    port_st.format.video.nFrameHeight = height;
+    port_st.format.video.nStride = width;
+    port_st.format.video.xFramerate = fps << 16;
     port_st.format.video.eCompressionFormat = OMX_VIDEO_CodingUnused;
     port_st.format.video.eColorFormat = OMX_COLOR_FormatYUV420PackedPlanar;
     error = OMX_SetParameter (camera.handle,
@@ -107,12 +138,12 @@ int main (int argc, char** argv)
                  dump_OMX_ERRORTYPE (error));
         exit (1);
     }
-    port_st.format.video.nFrameWidth = CAM_WIDTH;
-    port_st.format.video.nFrameHeight = CAM_HEIGHT;
-    port_st.format.video.nStride = CAM_WIDTH;
-    port_st.format.video.xFramerate = VIDEO_FRAMERATE << 16;
+    port_st.format.video.nFrameWidth = width;
+    port_st.format.video.nFrameHeight = height;
+    port_st.format.video.nStride = width;
+    port_st.format.video.xFramerate = fps << 16;
     //Despite being configured later, these two fields need to be set
-    port_st.format.video.nBitrate = VIDEO_QP ? 0 : VIDEO_BITRATE;
+    port_st.format.video.nBitrate = VIDEO_QP ? 0 : bitrate;
     port_st.format.video.eCompressionFormat = OMX_VIDEO_CodingAVC;
     error = OMX_SetParameter (encoder.handle, OMX_IndexParamPortDefinition,
                               &port_st);
@@ -188,7 +219,7 @@ int main (int argc, char** argv)
     // Prepare rtsp server
     pthread_t server_thread;
     PI_MEMORY_BUFFER* rtsp_buffer =
-        new PI_MEMORY_BUFFER (1000000/VIDEO_FRAMERATE);
+        new PI_MEMORY_BUFFER (1000000/fps);
     
     
 	// Create rtsp thread
