@@ -228,7 +228,7 @@ int main (int argc, char** argv)
     serverParams.rtsp_buffer = rtsp_buffer;
     serverParams.captureUrl = captureUrl;
     int ret = pthread_create (&server_thread, NULL,
-                            &startRtspServer, (void*)serverParams);
+                            &startRtspServer, &serverParams);
     if (ret != 0) {
         fprintf (stderr, "error: pthread_create: %d\n", ret);
         exit (1);
