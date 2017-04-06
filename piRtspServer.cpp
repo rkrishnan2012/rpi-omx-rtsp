@@ -3,6 +3,7 @@
 
 void* startRtspServer (void* arg)
 {
+	struct rtsp_server_params *serverParams = (rtsp_server_params*) arg;
 	// Begin by setting up our usage environment
 	TaskScheduler* scheduler = BasicTaskScheduler::createNew ();
 	UsageEnvironment* env = BasicUsageEnvironment::createNew (*scheduler);
@@ -10,7 +11,7 @@ void* startRtspServer (void* arg)
 	// Create groupsocks for RTP and RTCP
 	// This is a multicast address
 	struct in_addr destinationAddress;
-	destinationAddress.s_addr = chooseRandomIPv4SSMAddress (*env);
+	inet_pton(AF_INET, serverParams.captureUrl, &(destinationAddress.s_addr));
 
 	const unsigned short rtpPortNum = 18888;
 	const unsigned short rtcpPortNum = rtpPortNum + 1;
@@ -26,7 +27,7 @@ void* startRtspServer (void* arg)
 
 	// Create an input buffer source
     // arg must be the input buffer structure
-    PI_MEMORY_BUFFER* input_buffer = (PI_MEMORY_BUFFER*)arg;
+    PI_MEMORY_BUFFER* input_buffer = serverParams.rtsp_buffer;
     piMemoryBufferedSource* bufferedSource = piMemoryBufferedSource::createNew (
 		*env, input_buffer, True);
 	if (bufferedSource == NULL) {

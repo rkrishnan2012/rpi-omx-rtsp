@@ -14,7 +14,6 @@
 #include "omx_utils.hh"
 #include "piRtspServer.hh"
 
-
 int main (int argc, char** argv)
 {
     bool verbose = 0;
@@ -37,13 +36,13 @@ int main (int argc, char** argv)
             case 'b':   bitrate = atoi(optarg); break;
             case 'h':
             {
-                std::cout << argv[0] << " [-v] [-w width] [-h height] dest_device" << std::endl;
+                std::cout << argv[0] << " [-v] [-W width] [-H height]" << std::endl;
                 std::cout << "\t -v            : verbose " << std::endl;
-                std::cout << "\t -w width      : capture width (default "<< width << ")" << std::endl;
-                std::cout << "\t -h height     : capture height (default "<< height << ")" << std::endl;
+                std::cout << "\t -W width      : capture width (default "<< width << ")" << std::endl;
+                std::cout << "\t -H height     : capture height (default "<< height << ")" << std::endl;
                 std::cout << "\t -f fps        : capture framerate (default "<< fps << ")" << std::endl;
                 std::cout << "\t -b bitrate    : capture bitrate (default "<< bitrate << ")" << std::endl;
-                std::cout << "\t -r            : rtsp url (default " << captureUrl << ")" << std::endl;
+                std::cout << "\t -r url        : rtsp url (default " << captureUrl << ")" << std::endl;
                 exit(0);
             }
         }
@@ -225,8 +224,11 @@ int main (int argc, char** argv)
     
     
 	// Create rtsp thread
+    struct rtsp_server_params serverParams;
+    serverParams.rtsp_buffer = rtsp_buffer;
+    serverParams.captureUrl = captureUrl;
     int ret = pthread_create (&server_thread, NULL,
-                            &startRtspServer, (void*)rtsp_buffer);
+                            &startRtspServer, (void*)serverParams);
     if (ret != 0) {
         fprintf (stderr, "error: pthread_create: %d\n", ret);
         exit (1);
