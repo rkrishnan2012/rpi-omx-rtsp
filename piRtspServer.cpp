@@ -1,7 +1,7 @@
 #include "piRtspServer.hh"
 
 
-void* startRtspServer (void* arg, char* captureUrl)
+void* startRtspServer (void* arg)
 {
 	// Begin by setting up our usage environment
 	TaskScheduler* scheduler = BasicTaskScheduler::createNew ();
